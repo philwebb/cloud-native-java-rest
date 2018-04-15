@@ -39,9 +39,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.RestTemplate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -91,7 +90,8 @@ public class CustomerProtobufRestControllerTest {
 		given(this.customerRepository.findById(this.wellKnownCustomer.getId()))
 				.willReturn(Optional.of(this.wellKnownCustomer));
 
-		String fn = "Peter", ln = "Parker";
+		String fn = "Peter";
+		String ln = "Parker";
 
 		CustomerProtos.Customer customer = CustomerProtos.Customer.newBuilder()
 				.setId(existing.getId()).setFirstName(fn).setLastName(ln).build();
@@ -114,17 +114,12 @@ public class CustomerProtobufRestControllerTest {
 				.andExpect(header().string("Location", notNullValue()));
 
 		this.mockMvc.perform(get(this.rootPath + existing.getId()))
-				.andExpect(mvcResult -> {
-
+				.andExpect((mvcResult) -> {
 					byte[] response = mvcResult.getResponse().getContentAsByteArray();
-
 					CustomerProtos.Customer responseCustomer = CustomerProtos.Customer
 							.parseFrom(response);
-
 					assertCustomerEquals(responseCustomer, updated);
-
 				});
-
 	}
 
 	@Test
@@ -162,18 +157,18 @@ public class CustomerProtobufRestControllerTest {
 				.andExpect(content().contentType(this.protobufMediaType)).andReturn();
 		CustomerProtos.Customers customerProtobuf = CustomerProtos.Customers
 				.parseFrom(mvcResult.getResponse().getContentAsByteArray());
-		assertTrue(customerProtobuf.getCustomerList().size() > 0);
+		assertThat(customerProtobuf.getCustomerList()).isNotEmpty();
 		CustomerProtos.Customer customer = customerProtobuf.getCustomerList().stream()
-				.filter(c -> c.getId() == this.wellKnownCustomer.getId()).findFirst()
+				.filter((c) -> c.getId() == this.wellKnownCustomer.getId()).findFirst()
 				.get();
 		assertCustomerEquals(customer, this.wellKnownCustomer);
 	}
 
 	private void assertCustomerEquals(CustomerProtos.Customer customerProtobuf,
 			Customer jpaCustomer) {
-		assertEquals(jpaCustomer.getFirstName(), customerProtobuf.getFirstName());
-		assertEquals(jpaCustomer.getLastName(), customerProtobuf.getLastName());
-		assertEquals((long) jpaCustomer.getId(), customerProtobuf.getId());
+		assertThat(customerProtobuf.getFirstName()).isEqualTo(jpaCustomer.getFirstName());
+		assertThat(customerProtobuf.getLastName()).isEqualTo(jpaCustomer.getLastName());
+		assertThat(customerProtobuf.getId()).isEqualTo(jpaCustomer.getId());
 	}
 
 	@Configuration

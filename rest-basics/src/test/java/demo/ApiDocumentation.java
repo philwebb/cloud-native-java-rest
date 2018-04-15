@@ -37,45 +37,40 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@formatter:off
 // <1>
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class,
-        webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 public class ApiDocumentation {
-//@formatter:off
 
- // <1>
- // @Rule public final RestDocumentation restDocumentation =
- //   new RestDocumentation(
- //  "target/generated-snippets");
+	// <1>
+	// @Rule public final RestDocumentation restDocumentation =
+	// new RestDocumentation(
+	// "target/generated-snippets");
 
- @Autowired
- private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
- @Test
- public void errorExample() throws Exception {
-  this.mockMvc
-   .perform(
-    get("/error")
-     .contentType(MediaType.APPLICATION_JSON)
-     .requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 400)
-     .requestAttr(RequestDispatcher.ERROR_REQUEST_URI, "/customers")
-     .requestAttr(RequestDispatcher.ERROR_MESSAGE,
-      "The customer 'http://localhost:8443/v1/customers/123' does not exist"))
-   .andDo(print()).andExpect(status().isBadRequest())
-   .andExpect(jsonPath("error", is("Bad Request")))
-   .andExpect(jsonPath("timestamp", is(notNullValue())))
-   .andExpect(jsonPath("status", is(400)))
-   .andExpect(jsonPath("path", is(notNullValue())))
-   .andDo(document("error-example")); // <3>
- }
+	@Test
+	public void errorExample() throws Exception {
+		this.mockMvc.perform(get("/error").contentType(MediaType.APPLICATION_JSON)
+				.requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 400)
+				.requestAttr(RequestDispatcher.ERROR_REQUEST_URI, "/customers")
+				.requestAttr(RequestDispatcher.ERROR_MESSAGE,
+						"The customer 'http://localhost:8443/v1/customers/123' does not exist"))
+				.andDo(print()).andExpect(status().isBadRequest())
+				.andExpect(jsonPath("error", is("Bad Request")))
+				.andExpect(jsonPath("timestamp", is(notNullValue())))
+				.andExpect(jsonPath("status", is(400)))
+				.andExpect(jsonPath("path", is(notNullValue())))
+				.andDo(document("error-example")); // <3>
+	}
 
- @Test
- public void indexExample() throws Exception {
-  this.mockMvc.perform(get("/v1/customers")).andExpect(status().isOk())
-   .andDo(document("index-example"));
- }
+	@Test
+	public void indexExample() throws Exception {
+		this.mockMvc.perform(get("/v1/customers")).andExpect(status().isOk())
+				.andDo(document("index-example"));
+	}
+
 }

@@ -72,7 +72,9 @@ public class CustomerProfilePhotoRestControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
-	private Customer bruceBanner, peterParker;
+	private Customer bruceBanner;
+
+	private Customer peterParker;
 
 	private byte[] dogeBytes;
 
@@ -107,7 +109,7 @@ public class CustomerProfilePhotoRestControllerTest {
 	public void before() throws Throwable {
 
 		Resource dogeResource = new ClassPathResource("doge.jpg");
-		dogeBytes = StreamUtils.copyToByteArray(dogeResource.getInputStream());
+		this.dogeBytes = StreamUtils.copyToByteArray(dogeResource.getInputStream());
 		Assert.assertTrue(dogeResource.contentLength() > 0);
 		Assert.assertTrue(dogeResource.exists());
 

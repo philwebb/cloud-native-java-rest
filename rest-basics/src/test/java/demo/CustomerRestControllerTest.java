@@ -91,9 +91,9 @@ public class CustomerRestControllerTest {
 
 		given(this.customerRepository.findAll()).willReturn(customers);
 
-		this.mockMvc.perform(get(this.rootPath).accept(jsonContentType))
+		this.mockMvc.perform(get(this.rootPath).accept(this.jsonContentType))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(jsonContentType))
+				.andExpect(content().contentType(this.jsonContentType))
 				.andExpect(jsonPath("$", hasSize(lambaMatcher("the count should be >= 1",
 						(Integer i) -> i >= 1))));
 	}
@@ -102,9 +102,9 @@ public class CustomerRestControllerTest {
 	public void testGet() throws Exception {
 		this.mockMvc
 				.perform(get(this.rootPath + "/" + this.wellKnownCustomer.getId())
-						.contentType(jsonContentType).accept(jsonContentType))
+						.contentType(this.jsonContentType).accept(this.jsonContentType))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(jsonContentType))
+				.andExpect(content().contentType(this.jsonContentType))
 				.andExpect(jsonPath("$.firstName",
 						is(this.wellKnownCustomer.getFirstName())))
 				.andExpect(
@@ -157,7 +157,8 @@ public class CustomerRestControllerTest {
 		String content = "{ \"id\": \"" + existing.getId() + "\", \"firstName\": \"" + fn
 				+ "\", \"lastName\": \"" + ln + "\" }";
 		String idPath = this.rootPath + "/" + existing.getId();
-		this.mockMvc.perform(put(idPath).contentType(jsonContentType).content(content))
+		this.mockMvc
+				.perform(put(idPath).contentType(this.jsonContentType).content(content))
 				.andExpect(status().isCreated())
 				.andExpect(header().string("Location", notNullValue()));
 
