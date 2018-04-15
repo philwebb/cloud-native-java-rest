@@ -1,8 +1,30 @@
+/*
+ * Copyright 2017-2018 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package demo;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.RequestDispatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,17 +33,17 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.servlet.RequestDispatcher;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -76,7 +98,7 @@ public class HypermediaApiDocumentation {
 
 	@Test
 	public void customersCreateExample() throws Exception {
-		Map<String, String> customer = new HashMap<String, String>();
+		Map<String, String> customer = new HashMap<>();
 		customer.put("firstName", "Chris");
 		customer.put("lastName", "Richardson");
 
@@ -105,7 +127,7 @@ public class HypermediaApiDocumentation {
 
 	@Test
 	public void customerGetExample() throws Exception {
-		Map<String, String> customer = new HashMap<String, String>();
+		Map<String, String> customer = new HashMap<>();
 		customer.put("firstName", "Jez");
 		customer.put("lastName", "Humble");
 
@@ -138,7 +160,7 @@ public class HypermediaApiDocumentation {
 
 	@Test
 	public void customerUpdateExample() throws Exception {
-		Map<String, String> customer = new HashMap<String, String>();
+		Map<String, String> customer = new HashMap<>();
 		customer.put("firstName", "Martin");
 		customer.put("lastName", "Fowler");
 
@@ -153,7 +175,7 @@ public class HypermediaApiDocumentation {
 				.andExpect(jsonPath("lastName", is(customer.get("lastName"))))
 				.andExpect(jsonPath("_links.self.href", is(customerLocation)));
 
-		Map<String, String> customerUpdate = new HashMap<String, String>();
+		Map<String, String> customerUpdate = new HashMap<>();
 		customerUpdate.put("firstName", "Martin");
 		customerUpdate.put("lastName", "Fowler");
 
