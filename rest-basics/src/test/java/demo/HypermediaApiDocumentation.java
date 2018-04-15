@@ -32,154 +32,141 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs(outputDir = "target/generated-snippets")
 public class HypermediaApiDocumentation {
 
- @Autowired
- private ObjectMapper objectMapper;
+	@Autowired
+	private ObjectMapper objectMapper;
 
- @Autowired
- private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
- @Test
- public void errorExample() throws Exception {
-  this.mockMvc
-   .perform(
-    get("/error")
-     .requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 400)
-     .requestAttr(RequestDispatcher.ERROR_REQUEST_URI, "/customers")
-     .requestAttr(RequestDispatcher.ERROR_MESSAGE,
-      "The customer 'http://localhost:8443/v2/customers/123' does not exist"))
-   .andDo(print())
-   .andExpect(status().isBadRequest())
-   .andExpect(jsonPath("error", is("Bad Request")))
-   .andExpect(jsonPath("timestamp", is(notNullValue())))
-   .andExpect(jsonPath("status", is(400)))
-   .andExpect(jsonPath("path", is(notNullValue())))
-   .andDo(
-    document(
-     "error-example",
-     responseFields(
-      fieldWithPath("error").description(
-       "The HTTP error that occurred, e.g. `Bad Request`"),
-      fieldWithPath("message").description(
-       "A description of the cause of the error"),
-      fieldWithPath("path").description(
-       "The path to which the request was made"),
-      fieldWithPath("status").description("The HTTP status code, e.g. `400`"),
-      fieldWithPath("timestamp").description(
-       "The time, in milliseconds, at which the error occurred"))));
- }
+	@Test
+	public void errorExample() throws Exception {
+		this.mockMvc.perform(get("/error")
+				.requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 400)
+				.requestAttr(RequestDispatcher.ERROR_REQUEST_URI, "/customers")
+				.requestAttr(RequestDispatcher.ERROR_MESSAGE,
+						"The customer 'http://localhost:8443/v2/customers/123' does not exist"))
+				.andDo(print()).andExpect(status().isBadRequest())
+				.andExpect(jsonPath("error", is("Bad Request")))
+				.andExpect(jsonPath("timestamp", is(notNullValue())))
+				.andExpect(jsonPath("status", is(400)))
+				.andExpect(jsonPath("path", is(notNullValue())))
+				.andDo(document("error-example", responseFields(
+						fieldWithPath("error").description(
+								"The HTTP error that occurred, e.g. `Bad Request`"),
+						fieldWithPath("message")
+								.description("A description of the cause of the error"),
+						fieldWithPath("path")
+								.description("The path to which the request was made"),
+						fieldWithPath("status")
+								.description("The HTTP status code, e.g. `400`"),
+						fieldWithPath("timestamp").description(
+								"The time, in milliseconds, at which the error occurred"))));
+	}
 
- @Test
- public void customersListExample() throws Exception {
+	@Test
+	public void customersListExample() throws Exception {
 
-  this.mockMvc
-   .perform(get("/v2/customers"))
-   .andExpect(status().isOk())
-   .andDo(
-    document(
-     "customers-list-example",
-     responseFields(
-      fieldWithPath("_links.self.href").description("A link to the Customers"),
-      fieldWithPath("_embedded.customers").description(
-       "An array of <<resources-customer, Customer resources>>"))));
- }
+		this.mockMvc.perform(get("/v2/customers")).andExpect(status().isOk())
+				.andDo(document("customers-list-example", responseFields(
+						fieldWithPath("_links.self.href")
+								.description("A link to the Customers"),
+						fieldWithPath("_embedded.customers").description(
+								"An array of <<resources-customer, Customer resources>>"))));
+	}
 
- @Test
- public void customersCreateExample() throws Exception {
-  Map<String, String> customer = new HashMap<String, String>();
-  customer.put("firstName", "Chris");
-  customer.put("lastName", "Richardson");
+	@Test
+	public void customersCreateExample() throws Exception {
+		Map<String, String> customer = new HashMap<String, String>();
+		customer.put("firstName", "Chris");
+		customer.put("lastName", "Richardson");
 
-  this.mockMvc
-   .perform(
-    post("/v2/customers").contentType(MediaTypes.HAL_JSON).content(
-     this.objectMapper.writeValueAsString(customer)))
-   .andExpect(status().isCreated())
-   .andDo(
-    document(
-     "customers-create-example",
-     links(
-      linkWithRel("self").description("This <<resources-customer,customer>>"),
-      linkWithRel("profile-photo").description(
-       "The <<resources-profile-photo,profile-photo>>")),
-     requestFields(
-      fieldWithPath("firstName").description("the first name of the customer"),
-      fieldWithPath("lastName").description("the last name of the customer")),
-     responseFields(
-      fieldWithPath("firstName").description("The first name of the customer"),
-      fieldWithPath("lastName").description("The last name of the customer"),
-      fieldWithPath("_links").description(
-       "<<resources-customer-links,Links>> to other resources"))));
- }
+		this.mockMvc
+				.perform(post("/v2/customers").contentType(MediaTypes.HAL_JSON)
+						.content(this.objectMapper.writeValueAsString(customer)))
+				.andExpect(status().isCreated())
+				.andDo(document("customers-create-example",
+						links(linkWithRel("self")
+								.description("This <<resources-customer,customer>>"),
+								linkWithRel("profile-photo").description(
+										"The <<resources-profile-photo,profile-photo>>")),
+						requestFields(
+								fieldWithPath("firstName")
+										.description("the first name of the customer"),
+								fieldWithPath("lastName")
+										.description("the last name of the customer")),
+						responseFields(
+								fieldWithPath("firstName")
+										.description("The first name of the customer"),
+								fieldWithPath("lastName")
+										.description("The last name of the customer"),
+								fieldWithPath("_links").description(
+										"<<resources-customer-links,Links>> to other resources"))));
+	}
 
- @Test
- public void customerGetExample() throws Exception {
-  Map<String, String> customer = new HashMap<String, String>();
-  customer.put("firstName", "Jez");
-  customer.put("lastName", "Humble");
+	@Test
+	public void customerGetExample() throws Exception {
+		Map<String, String> customer = new HashMap<String, String>();
+		customer.put("firstName", "Jez");
+		customer.put("lastName", "Humble");
 
-  String customerLocation = this.mockMvc
-   .perform(
-    post("/v2/customers").contentType(MediaTypes.HAL_JSON).content(
-     this.objectMapper.writeValueAsString(customer)))
-   .andExpect(status().isCreated()).andReturn().getResponse()
-   .getHeader("Location");
+		String customerLocation = this.mockMvc
+				.perform(post("/v2/customers").contentType(MediaTypes.HAL_JSON)
+						.content(this.objectMapper.writeValueAsString(customer)))
+				.andExpect(status().isCreated()).andReturn().getResponse()
+				.getHeader("Location");
 
-  this.mockMvc
-   .perform(get(customerLocation))
-   .andExpect(status().isOk())
-   .andExpect(jsonPath("firstName", is(customer.get("firstName"))))
-   .andExpect(jsonPath("lastName", is(customer.get("lastName"))))
-   .andExpect(jsonPath("_links.self.href", is(customerLocation)))
-   .andDo(
-    document(
-     "customer-get-example",
-     links(
-      linkWithRel("self").description("This <<resources-customer,customer>>"),
-      linkWithRel("profile-photo").description(
-       "The <<resources-profile-photo,profile-photo>>")),
-     responseFields(
-      // fieldWithPath("id").description("The id of this customer"),
-      fieldWithPath("firstName").description("The first name of the customer"),
-      fieldWithPath("lastName").description("The last name of the customer"),
-      fieldWithPath("_links").description(
-       "<<resources-customer-links,Links>> to other resources"))));
+		this.mockMvc.perform(get(customerLocation)).andExpect(status().isOk())
+				.andExpect(jsonPath("firstName", is(customer.get("firstName"))))
+				.andExpect(jsonPath("lastName", is(customer.get("lastName"))))
+				.andExpect(jsonPath("_links.self.href", is(customerLocation)))
+				.andDo(document("customer-get-example",
+						links(linkWithRel("self").description(
+								"This <<resources-customer,customer>>"),
+								linkWithRel("profile-photo").description(
+										"The <<resources-profile-photo,profile-photo>>")),
+						responseFields(
+								// fieldWithPath("id").description("The id of this
+								// customer"),
+								fieldWithPath("firstName")
+										.description("The first name of the customer"),
+								fieldWithPath("lastName")
+										.description("The last name of the customer"),
+								fieldWithPath("_links").description(
+										"<<resources-customer-links,Links>> to other resources"))));
 
- }
+	}
 
- @Test
- public void customerUpdateExample() throws Exception {
-  Map<String, String> customer = new HashMap<String, String>();
-  customer.put("firstName", "Martin");
-  customer.put("lastName", "Fowler");
+	@Test
+	public void customerUpdateExample() throws Exception {
+		Map<String, String> customer = new HashMap<String, String>();
+		customer.put("firstName", "Martin");
+		customer.put("lastName", "Fowler");
 
-  String customerLocation = this.mockMvc
-   .perform(
-    post("/v2/customers").contentType(MediaTypes.HAL_JSON).content(
-     this.objectMapper.writeValueAsString(customer)))
-   .andExpect(status().isCreated()).andReturn().getResponse()
-   .getHeader("Location");
+		String customerLocation = this.mockMvc
+				.perform(post("/v2/customers").contentType(MediaTypes.HAL_JSON)
+						.content(this.objectMapper.writeValueAsString(customer)))
+				.andExpect(status().isCreated()).andReturn().getResponse()
+				.getHeader("Location");
 
-  this.mockMvc.perform(get(customerLocation)).andExpect(status().isOk())
-   .andExpect(jsonPath("firstName", is(customer.get("firstName"))))
-   .andExpect(jsonPath("lastName", is(customer.get("lastName"))))
-   .andExpect(jsonPath("_links.self.href", is(customerLocation)));
+		this.mockMvc.perform(get(customerLocation)).andExpect(status().isOk())
+				.andExpect(jsonPath("firstName", is(customer.get("firstName"))))
+				.andExpect(jsonPath("lastName", is(customer.get("lastName"))))
+				.andExpect(jsonPath("_links.self.href", is(customerLocation)));
 
-  Map<String, String> customerUpdate = new HashMap<String, String>();
-  customerUpdate.put("firstName", "Martin");
-  customerUpdate.put("lastName", "Fowler");
+		Map<String, String> customerUpdate = new HashMap<String, String>();
+		customerUpdate.put("firstName", "Martin");
+		customerUpdate.put("lastName", "Fowler");
 
-  this.mockMvc
-   .perform(
-    put(customerLocation).contentType(MediaTypes.HAL_JSON).content(
-     this.objectMapper.writeValueAsString(customerUpdate)))
-   .andExpect(status().isCreated())
-   .andDo(
-    document(
-     "customer-update-example",
-     requestFields(
-      fieldWithPath("firstName").description("The first name of the customer")
-       .optional(),
-      fieldWithPath("lastName").description("The last name of the customer")
-       .optional())));
- }
+		this.mockMvc
+				.perform(put(customerLocation).contentType(MediaTypes.HAL_JSON)
+						.content(this.objectMapper.writeValueAsString(customerUpdate)))
+				.andExpect(status().isCreated())
+				.andDo(document("customer-update-example",
+						requestFields(fieldWithPath("firstName")
+								.description("The first name of the customer").optional(),
+								fieldWithPath("lastName")
+										.description("The last name of the customer")
+										.optional())));
+	}
+
 }

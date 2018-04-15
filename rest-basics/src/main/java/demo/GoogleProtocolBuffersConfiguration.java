@@ -7,8 +7,9 @@ import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
 @Configuration
 class GoogleProtocolBuffersConfiguration {
 
- @Bean
- ProtobufHttpMessageConverter protobufHttpMessageConverter() {
-  return new ProtobufHttpMessageConverter();
- }
+	@Bean
+	ProtobufHttpMessageConverter protobufHttpMessageConverter() {
+		return new ProtobufHttpMessageConverter();
+	}
+
 }

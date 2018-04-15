@@ -19,47 +19,47 @@ import static org.junit.Assert.assertTrue;
 
 public class TraversonTest {
 
- private Log log = LogFactory.getLog(getClass());
+	private Log log = LogFactory.getLog(getClass());
 
- private ConfigurableApplicationContext server;
+	private ConfigurableApplicationContext server;
 
- private Traverson traverson;
+	private Traverson traverson;
 
- @Before
- public void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 
-  this.server = new SpringApplicationBuilder()
-   .properties(Collections.singletonMap("server.port", "0"))
-   .sources(DemoApplication.class).run();
-  // this.server =
-  // SpringApplication.run(DemoApplication.class);
-  this.traverson = this.server.getBean(Traverson.class);
- }
+		this.server = new SpringApplicationBuilder()
+				.properties(Collections.singletonMap("server.port", "0"))
+				.sources(DemoApplication.class).run();
+		// this.server =
+		// SpringApplication.run(DemoApplication.class);
+		this.traverson = this.server.getBean(Traverson.class);
+	}
 
- @After
- public void tearDown() throws Exception {
-  if (null != this.server) {
-   this.server.close();
-  }
- }
+	@After
+	public void tearDown() throws Exception {
+		if (null != this.server) {
+			this.server.close();
+		}
+	}
 
- @Test
- public void testTraverson() throws Exception {
+	@Test
+	public void testTraverson() throws Exception {
 
-  String nameOfMovie = "Cars";
+		String nameOfMovie = "Cars";
 
-  // <1>
-  Resources<Actor> actorResources = this.traverson
-   .follow("actors", "search", "by-movie")
-   .withTemplateParameters(Collections.singletonMap("movie", nameOfMovie))
-   .toObject(new ParameterizedTypeReference<Resources<Actor>>() {
-   });
+		// <1>
+		Resources<Actor> actorResources = this.traverson
+				.follow("actors", "search", "by-movie")
+				.withTemplateParameters(Collections.singletonMap("movie", nameOfMovie))
+				.toObject(new ParameterizedTypeReference<Resources<Actor>>() {
+				});
 
-  actorResources.forEach(this.log::info);
-  assertTrue(actorResources.getContent().size() > 0);
-  assertEquals(
-   actorResources.getContent().stream()
-    .filter(actor -> actor.fullName.equals("Owen Wilson"))
-    .collect(Collectors.toList()).size(), 1);
- }
+		actorResources.forEach(this.log::info);
+		assertTrue(actorResources.getContent().size() > 0);
+		assertEquals(actorResources.getContent().stream()
+				.filter(actor -> actor.fullName.equals("Owen Wilson"))
+				.collect(Collectors.toList()).size(), 1);
+	}
+
 }

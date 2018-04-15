@@ -40,162 +40,157 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class CustomerProfilePhotoRestControllerTest {
 
- private static Log log = LogFactory
-  .getLog(CustomerProfilePhotoRestControllerTest.class);
+	private static Log log = LogFactory
+			.getLog(CustomerProfilePhotoRestControllerTest.class);
 
- private static File tmpFile = new File(System.getProperty("java.io.tmpdir"),
-  "images/" + Long.toString(System.currentTimeMillis()));
+	private static File tmpFile = new File(System.getProperty("java.io.tmpdir"),
+			"images/" + Long.toString(System.currentTimeMillis()));
 
- @Autowired
- private CustomerRepository customerRepository;
+	@Autowired
+	private CustomerRepository customerRepository;
 
- @Autowired
- private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
- private Customer bruceBanner, peterParker;
+	private Customer bruceBanner, peterParker;
 
- private byte[] dogeBytes;
+	private byte[] dogeBytes;
 
- private String urlTemplate = "/customers/{id}/photo";
+	private String urlTemplate = "/customers/{id}/photo";
 
- private MediaType vndErrorMediaType = MediaType
-  .parseMediaType("application/vnd.error");
+	private MediaType vndErrorMediaType = MediaType
+			.parseMediaType("application/vnd.error");
 
- @AfterClass
- public static void after() throws Throwable {
-  if (tmpFile.exists()) {
-   Files.walkFileTree(tmpFile.toPath(), new SimpleFileVisitor<Path>() {
+	@AfterClass
+	public static void after() throws Throwable {
+		if (tmpFile.exists()) {
+			Files.walkFileTree(tmpFile.toPath(), new SimpleFileVisitor<Path>() {
 
-    @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-     throws IOException {
-     Files.delete(file);
-     return FileVisitResult.CONTINUE;
-    }
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+						throws IOException {
+					Files.delete(file);
+					return FileVisitResult.CONTINUE;
+				}
 
-    @Override
-    public FileVisitResult postVisitDirectory(Path dir, IOException exc)
-     throws IOException {
-     Files.delete(dir);
-     return FileVisitResult.CONTINUE;
-    }
-   });
-  }
- }
+				@Override
+				public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+						throws IOException {
+					Files.delete(dir);
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		}
+	}
 
- @Before
- public void before() throws Throwable {
+	@Before
+	public void before() throws Throwable {
 
-  Resource dogeResource = new ClassPathResource("doge.jpg");
-  dogeBytes = StreamUtils.copyToByteArray(dogeResource.getInputStream());
-  Assert.assertTrue(dogeResource.contentLength() > 0);
-  Assert.assertTrue(dogeResource.exists());
+		Resource dogeResource = new ClassPathResource("doge.jpg");
+		dogeBytes = StreamUtils.copyToByteArray(dogeResource.getInputStream());
+		Assert.assertTrue(dogeResource.contentLength() > 0);
+		Assert.assertTrue(dogeResource.exists());
 
-  this.bruceBanner = this.customerRepository.findById(1L).orElseGet(
-   () -> this.customerRepository.save(new Customer("Bruce", "Banner")));
+		this.bruceBanner = this.customerRepository.findById(1L).orElseGet(
+				() -> this.customerRepository.save(new Customer("Bruce", "Banner")));
 
-  this.peterParker = this.customerRepository.findById(2L).orElseGet(
-   () -> this.customerRepository.save(new Customer("Peter", "Parker")));
+		this.peterParker = this.customerRepository.findById(2L).orElseGet(
+				() -> this.customerRepository.save(new Customer("Peter", "Parker")));
 
- }
+	}
 
- @Test
- public void nonBlockingPhotoUploadWithExistingCustomer() throws Exception {
+	@Test
+	public void nonBlockingPhotoUploadWithExistingCustomer() throws Exception {
 
-  MvcResult mvcResult = this.mockMvc
-   .perform(
-    fileUpload(this.urlTemplate, this.bruceBanner.getId()).file("file",
-     this.dogeBytes)).andExpect(request().asyncStarted()).andReturn();
+		MvcResult mvcResult = this.mockMvc
+				.perform(fileUpload(this.urlTemplate, this.bruceBanner.getId())
+						.file("file", this.dogeBytes))
+				.andExpect(request().asyncStarted()).andReturn();
 
-  mvcResult.getAsyncResult();
+		mvcResult.getAsyncResult();
 
-  MvcResult mvcResultWithLocation = this.mockMvc
-   .perform(asyncDispatch(mvcResult)).andExpect(status().isCreated())
-   .andExpect(header().string("Location", notNullValue())).andReturn();
-  String location = mvcResultWithLocation.getResponse().getHeader("Location");
-  Assert.assertEquals(location, "http://localhost/customers/"
-   + this.bruceBanner.getId() + "/photo");
-  log.info("location: " + location);
- }
+		MvcResult mvcResultWithLocation = this.mockMvc.perform(asyncDispatch(mvcResult))
+				.andExpect(status().isCreated())
+				.andExpect(header().string("Location", notNullValue())).andReturn();
+		String location = mvcResultWithLocation.getResponse().getHeader("Location");
+		Assert.assertEquals(location,
+				"http://localhost/customers/" + this.bruceBanner.getId() + "/photo");
+		log.info("location: " + location);
+	}
 
- @Test
- public void nonBlockingPhotoUploadWithNonExistingCustomer() throws Exception {
+	@Test
+	public void nonBlockingPhotoUploadWithNonExistingCustomer() throws Exception {
 
-  MvcResult mvcResult = this.mockMvc
-   .perform(fileUpload(this.urlTemplate, 0).file("file", this.dogeBytes))
-   .andExpect(request().asyncStarted()).andReturn();
+		MvcResult mvcResult = this.mockMvc
+				.perform(fileUpload(this.urlTemplate, 0).file("file", this.dogeBytes))
+				.andExpect(request().asyncStarted()).andReturn();
 
-  mvcResult.getAsyncResult();
+		mvcResult.getAsyncResult();
 
-  this.mockMvc
-   .perform(asyncDispatch(mvcResult))
-   .andExpect(status().isNotFound())
-   .andExpect(
-    header()
-     .string(HttpHeaders.CONTENT_TYPE, this.vndErrorMediaType.toString()))
-   .andReturn();
- }
+		this.mockMvc.perform(asyncDispatch(mvcResult)).andExpect(status().isNotFound())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE,
+						this.vndErrorMediaType.toString()))
+				.andReturn();
+	}
 
- @Test
- public void photoDownloadWithExistingPhoto() throws Exception {
-  MvcResult mvcResult = this.mockMvc
-   .perform(
-    fileUpload(this.urlTemplate, this.bruceBanner.getId()).file("file",
-     this.dogeBytes)).andExpect(request().asyncStarted()).andReturn();
+	@Test
+	public void photoDownloadWithExistingPhoto() throws Exception {
+		MvcResult mvcResult = this.mockMvc
+				.perform(fileUpload(this.urlTemplate, this.bruceBanner.getId())
+						.file("file", this.dogeBytes))
+				.andExpect(request().asyncStarted()).andReturn();
 
-  mvcResult.getAsyncResult();
+		mvcResult.getAsyncResult();
 
-  this.mockMvc
-   .perform(
-    get(this.urlTemplate, this.bruceBanner.getId())
-     .accept(MediaType.IMAGE_JPEG))
-   .andExpect(
-    header().string(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE))
-   .andExpect(status().isOk());
- }
+		this.mockMvc
+				.perform(get(this.urlTemplate, this.bruceBanner.getId())
+						.accept(MediaType.IMAGE_JPEG))
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE,
+						MediaType.IMAGE_JPEG_VALUE))
+				.andExpect(status().isOk());
+	}
 
- @Test
- public void photoDownloadWithNonExistingPhoto() throws Exception {
-  MvcResult mvcResult = this.mockMvc
-   .perform(get(this.urlTemplate, this.peterParker.getId()))
-   .andExpect(status().isNotFound())
-   .andExpect(
-    header()
-     .string(HttpHeaders.CONTENT_TYPE, this.vndErrorMediaType.toString()))
-   .andReturn();
+	@Test
+	public void photoDownloadWithNonExistingPhoto() throws Exception {
+		MvcResult mvcResult = this.mockMvc
+				.perform(get(this.urlTemplate, this.peterParker.getId()))
+				.andExpect(status().isNotFound())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE,
+						this.vndErrorMediaType.toString()))
+				.andReturn();
 
-  log.info(mvcResult.getResponse().getContentAsString());
+		log.info(mvcResult.getResponse().getContentAsString());
 
-  this.mockMvc
-   .perform(get(this.urlTemplate, 0))
-   .andExpect(status().isNotFound())
-   .andExpect(
-    header()
-     .string(HttpHeaders.CONTENT_TYPE, this.vndErrorMediaType.toString()))
-   .andReturn();
- }
+		this.mockMvc.perform(get(this.urlTemplate, 0)).andExpect(status().isNotFound())
+				.andExpect(header().string(HttpHeaders.CONTENT_TYPE,
+						this.vndErrorMediaType.toString()))
+				.andReturn();
+	}
 
- @Configuration
- public static class EnvironmentConfiguration {
+	@Configuration
+	public static class EnvironmentConfiguration {
 
-  @Autowired
-  public void configureEnvironment(
-   ConfigurableWebApplicationContext webApplicationContext) throws Exception {
+		@Autowired
+		public void configureEnvironment(
+				ConfigurableWebApplicationContext webApplicationContext)
+				throws Exception {
 
-   PropertySource<Object> propertySource = new PropertySource<Object>("uploads") {
+			PropertySource<Object> propertySource = new PropertySource<Object>(
+					"uploads") {
 
-    @Override
-    public Object getProperty(String name) {
-     if (name.equals("upload.dir")) {
-      return tmpFile.getAbsolutePath();
-     }
-     return null;
-    }
-   };
+				@Override
+				public Object getProperty(String name) {
+					if (name.equals("upload.dir")) {
+						return tmpFile.getAbsolutePath();
+					}
+					return null;
+				}
+			};
 
-   webApplicationContext.getEnvironment().getPropertySources()
-    .addLast(propertySource);
-  }
- }
+			webApplicationContext.getEnvironment().getPropertySources()
+					.addLast(propertySource);
+		}
+
+	}
 
 }

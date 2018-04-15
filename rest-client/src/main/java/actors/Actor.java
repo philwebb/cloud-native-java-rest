@@ -8,25 +8,26 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Actor {
 
- @Id
- @GeneratedValue
- public Long id;
+	@Id
+	@GeneratedValue
+	public Long id;
 
- @ManyToOne
- public Movie movie;
+	@ManyToOne
+	public Movie movie;
 
- public String fullName;
+	public String fullName;
 
- public Actor(String n, Movie movie) {
-  this.fullName = n;
-  this.movie = movie;
- }
+	public Actor(String n, Movie movie) {
+		this.fullName = n;
+		this.movie = movie;
+	}
 
- Actor() {
- }
+	Actor() {
+	}
 
- @Override
- public String toString() {
-  return "Actor{" + "id=" + id + ", fullName='" + this.fullName + '\'' + '}';
- }
+	@Override
+	public String toString() {
+		return "Actor{" + "id=" + id + ", fullName='" + this.fullName + '\'' + '}';
+	}
+
 }

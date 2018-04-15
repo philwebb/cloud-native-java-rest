@@ -10,25 +10,26 @@ import java.util.Set;
 @Entity
 public class Movie {
 
- @Id
- @GeneratedValue
- public Long id;
+	@Id
+	@GeneratedValue
+	public Long id;
 
- public String title;
+	public String title;
 
- @OneToMany
- public Set<Actor> actors = new HashSet<>();
+	@OneToMany
+	public Set<Actor> actors = new HashSet<>();
 
- public Movie(String title) {
-  this.title = title;
- }
+	public Movie(String title) {
+		this.title = title;
+	}
 
- Movie() {
- }
+	Movie() {
+	}
 
- @Override
- public String toString() {
-  return "Movie{" + "id=" + id + ", title='" + title + '\'' + ", actors="
-   + actors + '}';
- }
+	@Override
+	public String toString() {
+		return "Movie{" + "id=" + id + ", title='" + title + '\'' + ", actors=" + actors
+				+ '}';
+	}
+
 }

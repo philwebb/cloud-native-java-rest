@@ -10,7 +10,8 @@ import org.springframework.data.rest.core.annotation.RestResource;
 @RepositoryRestResource
 public interface ActorRepository extends JpaRepository<Actor, Long> {
 
- @RestResource(path = "by-movie", rel = "by-movie")
- Page<Actor> findByMovieTitleIgnoringCase(@Param("movie") String title,
-  Pageable pageable);
+	@RestResource(path = "by-movie", rel = "by-movie")
+	Page<Actor> findByMovieTitleIgnoringCase(@Param("movie") String title,
+			Pageable pageable);
+
 }

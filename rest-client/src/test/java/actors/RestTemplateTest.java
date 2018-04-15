@@ -24,83 +24,83 @@ import static org.junit.Assert.assertTrue;
 
 public class RestTemplateTest {
 
- private Log log = LogFactory.getLog(getClass());
+	private Log log = LogFactory.getLog(getClass());
 
- private URI baseUri;
+	private URI baseUri;
 
- private ConfigurableApplicationContext server;
+	private ConfigurableApplicationContext server;
 
- private RestTemplate restTemplate;
+	private RestTemplate restTemplate;
 
- private MovieRepository movieRepository;
+	private MovieRepository movieRepository;
 
- private URI moviesUri;
+	private URI moviesUri;
 
- @Before
- public void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 
-  this.server = new SpringApplicationBuilder()
-   .properties(Collections.singletonMap("server.port", "0"))
-   .sources(DemoApplication.class).run();
+		this.server = new SpringApplicationBuilder()
+				.properties(Collections.singletonMap("server.port", "0"))
+				.sources(DemoApplication.class).run();
 
-  int port = this.server.getEnvironment().getProperty("local.server.port",
-   Integer.class, 8080);
+		int port = this.server.getEnvironment().getProperty("local.server.port",
+				Integer.class, 8080);
 
-  this.restTemplate = this.server.getBean(RestTemplate.class);
-  this.baseUri = URI.create("http://localhost:" + port + "/");
-  this.moviesUri = URI.create(this.baseUri.toString() + "movies");
-  this.movieRepository = this.server.getBean(MovieRepository.class);
- }
+		this.restTemplate = this.server.getBean(RestTemplate.class);
+		this.baseUri = URI.create("http://localhost:" + port + "/");
+		this.moviesUri = URI.create(this.baseUri.toString() + "movies");
+		this.movieRepository = this.server.getBean(MovieRepository.class);
+	}
 
- @After
- public void tearDown() throws Exception {
-  if (null != this.server) {
-   this.server.close();
-  }
- }
+	@After
+	public void tearDown() throws Exception {
+		if (null != this.server) {
+			this.server.close();
+		}
+	}
 
- @Test
- public void testRestTemplate() throws Exception {
-  // <1>
-  ResponseEntity<Movie> postMovieResponseEntity = this.restTemplate
-   .postForEntity(moviesUri, new Movie("Forest Gump"), Movie.class);
-  URI uriOfNewMovie = postMovieResponseEntity.getHeaders().getLocation();
-  log.info("the new movie lives at " + uriOfNewMovie);
+	@Test
+	public void testRestTemplate() throws Exception {
+		// <1>
+		ResponseEntity<Movie> postMovieResponseEntity = this.restTemplate
+				.postForEntity(moviesUri, new Movie("Forest Gump"), Movie.class);
+		URI uriOfNewMovie = postMovieResponseEntity.getHeaders().getLocation();
+		log.info("the new movie lives at " + uriOfNewMovie);
 
-  // <2>
-  JsonNode mapForMovieRecord = this.restTemplate.getForObject(uriOfNewMovie,
-   JsonNode.class);
-  log.info("\t..read as a Map.class: " + mapForMovieRecord);
-  assertEquals(mapForMovieRecord.get("title").asText(),
-   postMovieResponseEntity.getBody().title);
+		// <2>
+		JsonNode mapForMovieRecord = this.restTemplate.getForObject(uriOfNewMovie,
+				JsonNode.class);
+		log.info("\t..read as a Map.class: " + mapForMovieRecord);
+		assertEquals(mapForMovieRecord.get("title").asText(),
+				postMovieResponseEntity.getBody().title);
 
-  // <3>
-  Movie movieReference = this.restTemplate.getForObject(uriOfNewMovie,
-   Movie.class);
-  assertEquals(movieReference.title, postMovieResponseEntity.getBody().title);
-  log.info("\t..read as a Movie.class: " + movieReference);
+		// <3>
+		Movie movieReference = this.restTemplate.getForObject(uriOfNewMovie, Movie.class);
+		assertEquals(movieReference.title, postMovieResponseEntity.getBody().title);
+		log.info("\t..read as a Movie.class: " + movieReference);
 
-  // <4>
-  ResponseEntity<Movie> movieResponseEntity = this.restTemplate.getForEntity(
-   uriOfNewMovie, Movie.class);
-  assertEquals(movieResponseEntity.getStatusCode(), HttpStatus.OK);
-  assertEquals(movieResponseEntity.getHeaders().getContentType(),
-   MediaType.parseMediaType("application/json;charset=UTF-8"));
-  log.info("\t..read as a ResponseEntity<Movie>: " + movieResponseEntity);
+		// <4>
+		ResponseEntity<Movie> movieResponseEntity = this.restTemplate
+				.getForEntity(uriOfNewMovie, Movie.class);
+		assertEquals(movieResponseEntity.getStatusCode(), HttpStatus.OK);
+		assertEquals(movieResponseEntity.getHeaders().getContentType(),
+				MediaType.parseMediaType("application/json;charset=UTF-8"));
+		log.info("\t..read as a ResponseEntity<Movie>: " + movieResponseEntity);
 
-  // <5>
+		// <5>
 
-  //@formatter:off
+	//@formatter:off
   ParameterizedTypeReference<Resources<Movie>> movies =
           new ParameterizedTypeReference<Resources<Movie>>() {};
   //@formatter:on
-  ResponseEntity<Resources<Movie>> moviesResponseEntity = this.restTemplate
-   .exchange(this.moviesUri, HttpMethod.GET, null, movies);
-  Resources<Movie> movieResources = moviesResponseEntity.getBody();
-  movieResources.forEach(this.log::info);
-  assertEquals(movieResources.getContent().size(), this.movieRepository.count());
-  assertTrue(movieResources.getLinks().stream()
-   .filter(m -> m.getRel().equals("self")).count() == 1);
+		ResponseEntity<Resources<Movie>> moviesResponseEntity = this.restTemplate
+				.exchange(this.moviesUri, HttpMethod.GET, null, movies);
+		Resources<Movie> movieResources = moviesResponseEntity.getBody();
+		movieResources.forEach(this.log::info);
+		assertEquals(movieResources.getContent().size(), this.movieRepository.count());
+		assertTrue(movieResources.getLinks().stream()
+				.filter(m -> m.getRel().equals("self")).count() == 1);
 
- }
+	}
+
 }

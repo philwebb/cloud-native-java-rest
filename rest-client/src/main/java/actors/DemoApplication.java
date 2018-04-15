@@ -12,24 +12,26 @@ import org.springframework.transaction.support.TransactionTemplate;
 @SpringBootApplication
 public class DemoApplication {
 
- public static void main(String[] args) {
-  SpringApplication.run(DemoApplication.class, args);
- }
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
 
- @Bean
- TransactionTemplate transactionTemplate(
-  PlatformTransactionManager transactionManager) {
-  return new TransactionTemplate(transactionManager);
- }
+	@Bean
+	TransactionTemplate transactionTemplate(
+			PlatformTransactionManager transactionManager) {
+		return new TransactionTemplate(transactionManager);
+	}
 
- @Configuration
- static class SimpleRepositoryRestMvcConfiguration extends
-  RepositoryRestConfigurerAdapter {
+	@Configuration
+	static class SimpleRepositoryRestMvcConfiguration
+			extends RepositoryRestConfigurerAdapter {
 
-  @Override
-  public void configureRepositoryRestConfiguration(
-   RepositoryRestConfiguration config) {
-   config.exposeIdsFor(Movie.class, Actor.class);
-  }
- }
+		@Override
+		public void configureRepositoryRestConfiguration(
+				RepositoryRestConfiguration config) {
+			config.exposeIdsFor(Movie.class, Actor.class);
+		}
+
+	}
+
 }

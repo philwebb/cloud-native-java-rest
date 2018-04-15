@@ -20,26 +20,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = CustomerRestController.class)
 public class JsonpTest {
 
- @MockBean
- private CustomerRepository customerRepository;
+	@MockBean
+	private CustomerRepository customerRepository;
 
- @Autowired
- private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
- @Test
- public void testJsonpCallbacks() throws Throwable {
+	@Test
+	public void testJsonpCallbacks() throws Throwable {
 
-  given(this.customerRepository.findAll()).willReturn(
-   Arrays.asList(new Customer(1L, "A1", "B1"), new Customer(2L, "A2", "B2")));
+		given(this.customerRepository.findAll()).willReturn(Arrays
+				.asList(new Customer(1L, "A1", "B1"), new Customer(2L, "A2", "B2")));
 
-  String callbackName = "callMeMaybe";
-  this.mockMvc
-   .perform(get("/v1/customers?callback=" + callbackName))
-   .andExpect(status().isOk())
-   .andExpect(
-    content().string(
-     lambaMatcher("the result should contain the JavaScript"
-      + " invocation syntax if it's a JSONP request",
-      (String result) -> result.startsWith("/**/" + callbackName + "("))));
- }
+		String callbackName = "callMeMaybe";
+		this.mockMvc.perform(get("/v1/customers?callback=" + callbackName))
+				.andExpect(status().isOk())
+				.andExpect(content().string(lambaMatcher(
+						"the result should contain the JavaScript"
+								+ " invocation syntax if it's a JSONP request",
+						(String result) -> result
+								.startsWith("/**/" + callbackName + "("))));
+	}
+
 }

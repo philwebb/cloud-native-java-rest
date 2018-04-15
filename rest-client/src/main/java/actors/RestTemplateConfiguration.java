@@ -13,20 +13,20 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestTemplateConfiguration {
 
- @Bean
- RestTemplate restTemplate() {
+	@Bean
+	RestTemplate restTemplate() {
 
-  Log log = LogFactory.getLog(getClass());
+		Log log = LogFactory.getLog(getClass());
 
-  ClientHttpRequestInterceptor interceptor = (HttpRequest request, byte[] body,
-   ClientHttpRequestExecution execution) -> {
-   log.info(String.format("request to URI %s with HTTP verb '%s'",
-    request.getURI(), request.getMethod().toString()));
-   return execution.execute(request, body);
-  };
+		ClientHttpRequestInterceptor interceptor = (HttpRequest request, byte[] body,
+				ClientHttpRequestExecution execution) -> {
+			log.info(String.format("request to URI %s with HTTP verb '%s'",
+					request.getURI(), request.getMethod().toString()));
+			return execution.execute(request, body);
+		};
 
-  return new RestTemplateBuilder() // <1>
-   .additionalInterceptors(interceptor).build();
- }
+		return new RestTemplateBuilder() // <1>
+				.additionalInterceptors(interceptor).build();
+	}
 
 }

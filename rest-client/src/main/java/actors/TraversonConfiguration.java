@@ -14,11 +14,11 @@ import java.net.URI;
 @Configuration
 public class TraversonConfiguration {
 
- private int port;
+	private int port;
 
- private URI baseUri;
+	private URI baseUri;
 
- //@formatter:off
+	//@formatter:off
  @EventListener
  public void embeddedPortAvailable(
     EmbeddedServletContainerInitializedEvent e) {
@@ -27,12 +27,13 @@ public class TraversonConfiguration {
  }
  //@formatter:on
 
- // <1>
- @Bean
- @Lazy
- Traverson traverson(RestTemplate restTemplate) {
-  Traverson traverson = new Traverson(this.baseUri, MediaTypes.HAL_JSON);
-  traverson.setRestOperations(restTemplate);
-  return traverson;
- }
+	// <1>
+	@Bean
+	@Lazy
+	Traverson traverson(RestTemplate restTemplate) {
+		Traverson traverson = new Traverson(this.baseUri, MediaTypes.HAL_JSON);
+		traverson.setRestOperations(restTemplate);
+		return traverson;
+	}
+
 }

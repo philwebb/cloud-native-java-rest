@@ -8,9 +8,10 @@ import java.util.Optional;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
- Collection<Customer> findByFirstNameIgnoreCase(@Param("fn") String firstName);
+	Collection<Customer> findByFirstNameIgnoreCase(@Param("fn") String firstName);
 
- Optional<Customer> findById(@Param("id") Long id);
+	Optional<Customer> findById(@Param("id") Long id);
 
- Collection<Customer> findByLastNameIgnoreCase(@Param("ln") String ln);
+	Collection<Customer> findByLastNameIgnoreCase(@Param("ln") String ln);
+
 }
